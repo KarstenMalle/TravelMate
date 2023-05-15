@@ -1,6 +1,7 @@
 package com.example.travelmate.data.repository
 
 import com.example.travelmate.domain.model.Chat
+import com.example.travelmate.domain.model.ChatMessage
 import com.example.travelmate.domain.repository.ChatRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -19,10 +20,26 @@ class ChatRepositoryImpl @Inject constructor(
             .get()
             .await()
 
-        return chatDocs.documents.mapNotNull { doc ->
+        val chats = chatDocs.documents.mapNotNull { doc ->
             doc.toObject(Chat::class.java)
         }
+
+        return chats
     }
+
+    override suspend fun getMessages(uid: String, friendId: String): List<ChatMessage> {
+        val messageDocs = firestore.collection("users").document(uid).collection("chats")
+            .document(friendId).collection("messages")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .get()
+            .await()
+
+        return messageDocs.documents.mapNotNull { doc ->
+            doc.toObject(ChatMessage::class.java)
+        }
+    }
+
+
 
 
 }

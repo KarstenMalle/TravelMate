@@ -1,5 +1,6 @@
 package com.example.travelmate.domain.repository
 
+import com.example.travelmate.domain.model.Chat
 import com.example.travelmate.domain.model.ChatMessage
 import com.example.travelmate.domain.model.UserProfile
 
@@ -13,5 +14,6 @@ interface UserRepository {
     suspend fun searchUsers(query: String): List<UserProfile>
 
     suspend fun getChatMessages(uid: String, friendUid: String): List<ChatMessage>
-    suspend fun sendMessage(message: ChatMessage)
+    suspend fun sendMessage(message: ChatMessage, chatInfo: Chat)
+
 }

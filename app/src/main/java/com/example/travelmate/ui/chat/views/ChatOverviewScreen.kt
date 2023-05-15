@@ -2,10 +2,12 @@ package com.example.travelmate.ui.chat.views
 
 import BottomBar
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -14,7 +16,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberImagePainter
 import com.example.travelmate.navigation.Screen
 
 
@@ -30,6 +37,7 @@ fun ChatOverviewScreen(
 ) {
     val chats by viewModel.chats.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
+    val errorMessage by viewModel.errorMessage.observeAsState(null)
 
     Scaffold(
         topBar = {
@@ -56,20 +64,59 @@ fun ChatOverviewScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
+            } else if (errorMessage != null) {
+                Text(text = "Error: $errorMessage")
             } else {
                 LazyColumn {
                     items(chats) { chat ->
-                        Row {
-                            // Assuming there's a "lastMessage" field in your Chat data class
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onOpenChat(chat.id) }
+                                .padding(16.dp)
+                        ) {
+                            Image(
+                                painter = rememberImagePainter(chat.photoUrl),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .align(Alignment.CenterVertically)
+                            ) {
+                                Text(
+                                    text = chat.fullName,
+                                    style = MaterialTheme.typography.h6,
+                                    color = MaterialTheme.colors.onSurface,
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Text(
+                                    text = chat.lastMessage,
+                                    style = MaterialTheme.typography.body2,
+                                    color = MaterialTheme.colors.onSurface,
+                                )
+                            }
+
                             Text(
-                                text = chat.lastMessage,
-                                style = MaterialTheme.typography.body1,
+                                text = viewModel.getFormattedTime(chat.lastMessageTimestamp),
+                                style = MaterialTheme.typography.body2,
                                 color = MaterialTheme.colors.onSurface,
-                                modifier = Modifier.clickable { onOpenChat(chat.id) }
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.align(Alignment.CenterVertically)
                             )
                         }
                     }
                 }
+
             }
         }
     )

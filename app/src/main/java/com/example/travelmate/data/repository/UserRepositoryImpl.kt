@@ -1,5 +1,6 @@
 package com.example.travelmate.data.repository
 
+import com.example.travelmate.domain.model.Chat
 import com.example.travelmate.domain.model.ChatMessage
 import com.example.travelmate.domain.model.UserProfile
 import com.example.travelmate.domain.repository.UserRepository
@@ -82,9 +83,26 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendMessage(message: ChatMessage) {
+    override suspend fun sendMessage(message: ChatMessage, chatInfo: Chat) {
+        val batch = firestore.batch()
+
+        // Add the new message
+        val messageRef = firestore.collection("users").document(message.uid_from).collection("chats").document(message.uid_to).collection("messages")
+            .document()  // Create a new document reference with a unique ID
+        batch.set(messageRef, message)
+
+        // Update the chat document with the new message info
+        val chatRef = firestore.collection("users").document(message.uid_from).collection("chats").document(message.uid_to)
+        batch.set(chatRef, chatInfo)
+
+        // Commit the batch
+        batch.commit().await()
+
+        // After the batch is committed, order the messages by timestamp
         firestore.collection("users").document(message.uid_from).collection("chats").document(message.uid_to).collection("messages")
-            .add(message)
+            .orderBy("timestamp")
+            .get()
             .await()
     }
+
 }

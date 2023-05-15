@@ -5,14 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.travelmate.domain.model.Chat
 import com.example.travelmate.domain.model.ChatMessage
 import com.example.travelmate.domain.model.Response
 import com.example.travelmate.domain.model.UserProfile
 import com.example.travelmate.domain.repository.AuthRepository
 import com.example.travelmate.domain.repository.UserRepository
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -86,14 +89,24 @@ class ChatViewModel @Inject constructor(
         try {
             val uid = getCurrentUserUid()
             if (uid != null) {
+                val friendProfile = userRepository.getUserProfile(toUid)
+                val timestamp = System.currentTimeMillis()
                 val chatMessage = ChatMessage(
                     uid_from = uid,
                     uid_to = toUid,
                     fullName = fullName,
                     message = message,
-                    timestamp = System.currentTimeMillis()
+                    timestamp = timestamp
                 )
-                userRepository.sendMessage(chatMessage)
+                val date = Date(timestamp)
+                val chatInfo = Chat(
+                    id = toUid,
+                    lastMessage = message,
+                    lastMessageTimestamp = Timestamp(date),
+                    fullName = fullName,
+                    photoUrl = friendProfile?.photoUrl
+                )
+                userRepository.sendMessage(chatMessage, chatInfo)
                 loadMessages(toUid)  // Reload messages after sending a new one
                 navigateBack()
             } else {

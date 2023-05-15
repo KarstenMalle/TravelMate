@@ -112,8 +112,8 @@ fun NavGraph(
                 onAddFriend = {
                     navController.navigate(AddFriendsScreen.route)
                 },
-                onStartChat = {
-                    null
+                onStartChat = { route ->
+                    navController.navigate(route)
                 },
                 navigateToProfileScreen = {
                     navController.navigate(ProfileScreen.route)
@@ -142,8 +142,8 @@ fun NavGraph(
                 onNewChat = {
                     navController.navigate(NewChatScreen.route)
                 },
-                onOpenChat = {
-                    null
+                onOpenChat = { chatId ->
+                    navController.navigate("${ChatScreen.route}/$chatId")
                 },
                 navigateToProfileScreen = {
                     navController.navigate(ProfileScreen.route)
