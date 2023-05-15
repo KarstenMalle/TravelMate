@@ -57,14 +57,27 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended"
     //Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.1.0'
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
     //Hilt Navigation Compose
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_navigation_compose_version"
     //Firebase
     implementation platform("com.google.firebase:firebase-bom:$firebase_bom_version")
     implementation "com.google.firebase:firebase-auth-ktx"
+    implementation "com.google.firebase:firebase-storage-ktx"
     //Accompanist
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.3.0")
+    //Allows observation LiveData as a state
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
+    implementation("androidx.compose.runtime:runtime:1.4.3")
+    implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
+
+
+
+
+
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'

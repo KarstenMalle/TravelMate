@@ -31,7 +31,7 @@ fun VerifyEmailContent(
         )
         SmallSpacer()
         Text(
-            text = "If not, please also check the spam folder.",
+            text = "If not, please check the spam folder.",
             fontSize = 15.sp
         )
     }

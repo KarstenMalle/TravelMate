@@ -1,5 +1,8 @@
 package com.example.travelmate.data.repository
 
+import com.example.travelmate.domain.model.Response.Failure
+import com.example.travelmate.domain.model.Response.Success
+import com.example.travelmate.domain.repository.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import kotlinx.coroutines.CoroutineScope
@@ -8,9 +11,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.tasks.await
-import com.example.travelmate.domain.model.Response.Failure
-import com.example.travelmate.domain.model.Response.Success
-import com.example.travelmate.domain.repository.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -90,3 +90,4 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), auth.currentUser == null)
 }
+

@@ -1,4 +1,4 @@
-package com.example.travelmate.ui.profile
+package com.example.travelmate.ui.friends
 
 import BottomBar
 import androidx.compose.foundation.layout.Box
@@ -16,47 +16,42 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.travelmate.domain.model.Response
 import com.example.travelmate.navigation.Screen
 import com.example.travelmate.ui.components.TopBar
-import com.example.travelmate.ui.profile.components.ProfileContent
-import com.example.travelmate.ui.profile.components.RevokeAccess
-
-
+import com.example.travelmate.ui.friends.components.FriendsContent
 
 @Composable
-fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel(),
-    onEditProfile: () -> Unit,
-    navigateToFriendsScreen: () -> Unit,
+fun FriendsScreen(
+    viewModel: FriendsViewModel = hiltViewModel(),
+    onAddFriend: () -> Unit,
+    onStartChat: (String) -> Unit,
+    navigateToProfileScreen: () -> Unit,
     navigateToChatScreen: () -> Unit,
     navigateToMapScreen: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    val userProfileLoading = viewModel.userProfileLoading
+    val friendsLoading = viewModel.friendsLoading
 
     Scaffold(
         topBar = {
             TopBar(
-                title = "Profile",
+                title = "Friends",
                 signOut = {
                     viewModel.signOut()
-                },
-                revokeAccess = {
-                    viewModel.revokeAccess()
                 }
             )
         },
         bottomBar = {
             BottomBar(
-                currentRoute = Screen.ProfileScreen.route,
-                navigateToProfile = {},  // No action needed when already on profile screen
+                currentRoute = Screen.FriendsScreen.route,
+                navigateToProfile = navigateToProfileScreen,
                 navigateToMap = navigateToMapScreen,
-                navigateToFriends = navigateToFriendsScreen,
+                navigateToFriends = {},
                 navigateToChat = navigateToChatScreen
             )
         },
         content = { padding ->
-            when (userProfileLoading) {
+            when (friendsLoading) {
                 is Response.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -64,14 +59,17 @@ fun ProfileScreen(
                 }
                 is Response.Failure -> {
                     // Here you could display an error message or some error UI
-                    Text("Error loading profile")
+                    Text("Error loading friends")
                 }
                 is Response.Success -> {
-                    ProfileContent(
+                    FriendsContent(
                         padding = padding,
-                        userProfile = viewModel.userProfile,
-                        onEdit = {
-                            onEditProfile()
+                        friends = viewModel.friends,
+                        onAddFriend = {
+                            onAddFriend()
+                        },
+                        onStartChat = { friendUid ->
+                            onStartChat(friendUid)
                         }
                     )
                 }
@@ -80,17 +78,7 @@ fun ProfileScreen(
         scaffoldState = scaffoldState
     )
 
-    RevokeAccess(
-        scaffoldState = scaffoldState,
-        coroutineScope = coroutineScope,
-        signOut = {
-            viewModel.signOut()
-        }
-    )
-
-    val currentUserUid = viewModel.getCurrentUserUid()
-    LaunchedEffect(currentUserUid) {
-        currentUserUid?.let { viewModel.loadUserProfile(it) }
+    LaunchedEffect(Unit) {
+        viewModel.loadFriends(10)
     }
 }
-
