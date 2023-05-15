@@ -8,6 +8,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.travelmate.navigation.Screen.*
+import com.example.travelmate.ui.chat.ChatScreen
 import com.example.travelmate.ui.chat.views.ChatOverviewScreen
 import com.example.travelmate.ui.chat.views.NewChatScreen
 import com.example.travelmate.ui.edit_profile.EditProfileScreen
@@ -159,13 +160,25 @@ fun NavGraph(
             route = NewChatScreen.route
         ) {
             NewChatScreen(
-                navigateToChat = {
-                    null
+                navigateToChat = { route ->
+                    navController.navigate(route)
                 },
                 navigateBack = {
                     navController.popBackStack()
                 }
 
+            )
+        }
+        composable(
+            route = "${ChatScreen.route}/{friendId}"
+        ) { backStackEntry ->
+            val friendId = backStackEntry.arguments?.getString("friendId")
+            ChatScreen(
+                friendId = friendId ?: "",
+                navigateBack = {
+                    navController.popBackStack()
+                },
+                viewModel = hiltViewModel()
             )
         }
     }

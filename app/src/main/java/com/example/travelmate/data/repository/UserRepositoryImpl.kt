@@ -71,8 +71,8 @@ class UserRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun getChatMessages(uid: String, chatId: String): List<ChatMessage> {
-        val messageDocs = firestore.collection("users").document(uid).collection("chats").document(chatId).collection("messages")
+    override suspend fun getChatMessages(uid: String, friendUid: String): List<ChatMessage> {
+        val messageDocs = firestore.collection("users").document(uid).collection("chats").document(friendUid).collection("messages")
             .orderBy("timestamp")
             .get()
             .await()
@@ -82,8 +82,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendMessage(uid: String, chatId: String, message: ChatMessage) {
-        firestore.collection("users").document(uid).collection("chats").document(chatId).collection("messages")
+    override suspend fun sendMessage(message: ChatMessage) {
+        firestore.collection("users").document(message.uid_from).collection("chats").document(message.uid_to).collection("messages")
             .add(message)
             .await()
     }

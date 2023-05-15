@@ -12,6 +12,6 @@ interface UserRepository {
 
     suspend fun searchUsers(query: String): List<UserProfile>
 
-    suspend fun getChatMessages(uid: String, chatId: String): List<ChatMessage>
-    suspend fun sendMessage(uid: String, chatId: String, message: ChatMessage)
+    suspend fun getChatMessages(uid: String, friendUid: String): List<ChatMessage>
+    suspend fun sendMessage(message: ChatMessage)
 }

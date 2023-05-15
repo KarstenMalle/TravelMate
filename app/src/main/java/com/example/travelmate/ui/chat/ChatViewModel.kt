@@ -46,8 +46,18 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    var messages by mutableStateOf<List<ChatMessage>>(emptyList())
+    var friendProfile by mutableStateOf<UserProfile?>(null)
         private set
+
+    fun getFriendProfile(friendUid: String) = viewModelScope.launch {
+        try {
+            friendProfile = userRepository.getUserProfile(friendUid)
+        } catch (e: FirebaseFirestoreException) {
+            // Handle error
+        }
+    }
+
+
 
     var chatError by mutableStateOf<String?>(null)
         private set
@@ -55,13 +65,16 @@ class ChatViewModel @Inject constructor(
     var chatLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
         private set
 
-    fun loadMessages() = viewModelScope.launch {
+    var messages by mutableStateOf<List<ChatMessage>>(emptyList())
+        private set
+
+    fun loadMessages(friendUid: String) = viewModelScope.launch {
         chatLoading = Response.Loading
         try {
             val uid = getCurrentUserUid()
             if (uid != null) {
-                // val newMessages = userRepository.getChatMessages(uid)
-                // messages = newMessages
+                val newMessages = userRepository.getChatMessages(uid, friendUid)
+                messages = newMessages
             }
             chatLoading = Response.Success(true)
         } catch (e: FirebaseFirestoreException) {
@@ -69,12 +82,19 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(toUid: String, message: ChatMessage, navigateBack: () -> Unit) = viewModelScope.launch {
+    fun sendMessage(toUid: String, message: String, fullName: String, navigateBack: () -> Unit) = viewModelScope.launch {
         try {
             val uid = getCurrentUserUid()
             if (uid != null) {
-                userRepository.sendMessage(uid, toUid, message)
-                loadMessages()  // Reload messages after sending a new one
+                val chatMessage = ChatMessage(
+                    uid_from = uid,
+                    uid_to = toUid,
+                    fullName = fullName,
+                    message = message,
+                    timestamp = System.currentTimeMillis()
+                )
+                userRepository.sendMessage(chatMessage)
+                loadMessages(toUid)  // Reload messages after sending a new one
                 navigateBack()
             } else {
                 chatError = "Failed to send message. User is not logged in."
@@ -87,7 +107,7 @@ class ChatViewModel @Inject constructor(
     fun signOut() = authRepository.signOut()
 
 
-    private fun getCurrentUserUid(): String? {
+    fun getCurrentUserUid(): String? {
         return authRepository.currentUser?.uid
     }
 }
