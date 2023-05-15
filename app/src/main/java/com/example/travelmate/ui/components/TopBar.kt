@@ -14,11 +14,11 @@ import androidx.compose.ui.Modifier
 fun TopBar(
     title: String,
     signOut: () -> Unit,
-    revokeAccess: () -> Unit
+    revokeAccess: (() -> Unit)? = null
 ) {
     var openMenu by remember { mutableStateOf(false) }
 
-    TopAppBar (
+    TopAppBar(
         title = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -61,15 +61,17 @@ fun TopBar(
                         text = "Sign out"
                     )
                 }
-                DropdownMenuItem(
-                    onClick = {
-                        revokeAccess()
-                        openMenu = !openMenu
+                revokeAccess?.let { revoke ->
+                    DropdownMenuItem(
+                        onClick = {
+                            revoke()
+                            openMenu = !openMenu
+                        }
+                    ) {
+                        Text(
+                            text = "Revoke Access"
+                        )
                     }
-                ) {
-                    Text(
-                        text = "Revoke Access"
-                    )
                 }
             }
         }

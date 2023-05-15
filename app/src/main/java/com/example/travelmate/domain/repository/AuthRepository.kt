@@ -1,9 +1,9 @@
 package com.example.travelmate.domain.repository
 
+import com.example.travelmate.domain.model.Response
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import com.example.travelmate.domain.model.Response
 
 typealias SignUpResponse = Response<Boolean>
 typealias SendEmailVerificationResponse = Response<Boolean>

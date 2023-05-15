@@ -1,15 +1,12 @@
 package com.example.travelmate.ui.sign_up
 
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.travelmate.core.Utils.Companion.showMessage
-import com.example.travelmate.ui.sign_up.components.SendEmailVerification
-import com.example.travelmate.ui.sign_up.components.SignUp
-import com.example.travelmate.ui.sign_up.components.SignUpContent
-import com.example.travelmate.ui.sign_up.components.SignUpTopBar
+import com.example.travelmate.ui.sign_up.components.*
 
 @Composable
 @ExperimentalComposeUiApi
@@ -18,6 +15,7 @@ fun SignUpScreen(
     navigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    var step by remember { mutableStateOf(1)}
 
     Scaffold(
         topBar = {
@@ -26,13 +24,26 @@ fun SignUpScreen(
             )
         },
         content = { padding ->
-            SignUpContent(
-                padding = padding,
-                signUp = { email, password ->
-                    viewModel.signUpWithEmailAndPassword(email, password)
-                },
-                navigateBack = navigateBack
-            )
+            when (step) {
+                1 -> SignUpContent(
+                    padding = padding,
+                    signUp = { email, password ->
+                        viewModel.setEmailAndPassword(email, password)
+                        step = 2
+                    },
+                    navigateBack = navigateBack
+                )
+                2 -> RegistrationStep1 { fullName, age, country ->
+                    // Pass the values to the viewModel
+                    viewModel.setStep1Data(fullName, age, country)
+                    step = 3
+                }
+                3 -> RegistrationStep2 { interests, bio ->
+                    // Pass the values to the viewModel
+                    viewModel.setStep2Data(interests, bio)
+                    viewModel.signUpWithEmailAndPassword()
+                }
+            }
         }
     )
 
