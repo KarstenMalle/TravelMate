@@ -15,6 +15,7 @@ import com.example.travelmate.ui.forgot_pw.ForgotPasswordScreen
 import com.example.travelmate.ui.friends.FriendsScreen
 import com.example.travelmate.ui.friends.views.AddFriendsScreen
 import com.example.travelmate.ui.login.LoginScreen
+import com.example.travelmate.ui.map.MapsScreen
 import com.example.travelmate.ui.profile.ProfileScreen
 import com.example.travelmate.ui.sign_up.SignUpScreen
 import com.example.travelmate.ui.verify_email.VerifyEmailScreen
@@ -91,7 +92,7 @@ fun NavGraph(
                     navController.navigate(ChatOverviewScreen.route)
                 },
                 navigateToMapScreen = {
-                    // ... navigate to map screen ...
+                    navController.navigate(MapScreen.route)
                 }
             )
         }
@@ -152,6 +153,7 @@ fun NavGraph(
                 },
                 navigateToMapScreen = {
                     // ... navigate to map screen ...
+                    navController.navigate(MapScreen.route)
                 }
             )
         }
@@ -167,6 +169,13 @@ fun NavGraph(
                 }
 
             )
+        }
+        composable(
+            route = MapScreen.route
+        ){
+            MapsScreen(
+            )
+
         }
     }
 }
