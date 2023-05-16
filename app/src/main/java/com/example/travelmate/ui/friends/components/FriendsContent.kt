@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.example.travelmate.domain.model.UserProfile
+import com.example.travelmate.navigation.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -43,10 +44,9 @@ fun FriendsContent(
                         text = friend.fullName,
                         style = MaterialTheme.typography.body1,
                         color = MaterialTheme.colors.onSurface,
-                        modifier = Modifier.clickable { onStartChat(friend.uid) }
+                        modifier = Modifier.clickable { onStartChat("${Screen.ChatScreen.route}/${friend.uid}") }
                     )
                 }
-
             }
         }
 

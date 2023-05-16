@@ -5,14 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.travelmate.domain.model.Chat
 import com.example.travelmate.domain.model.ChatMessage
 import com.example.travelmate.domain.model.Response
 import com.example.travelmate.domain.model.UserProfile
 import com.example.travelmate.domain.repository.AuthRepository
 import com.example.travelmate.domain.repository.UserRepository
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestoreException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,8 +49,18 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    var messages by mutableStateOf<List<ChatMessage>>(emptyList())
+    var friendProfile by mutableStateOf<UserProfile?>(null)
         private set
+
+    fun getFriendProfile(friendUid: String) = viewModelScope.launch {
+        try {
+            friendProfile = userRepository.getUserProfile(friendUid)
+        } catch (e: FirebaseFirestoreException) {
+            // Handle error
+        }
+    }
+
+
 
     var chatError by mutableStateOf<String?>(null)
         private set
@@ -55,13 +68,16 @@ class ChatViewModel @Inject constructor(
     var chatLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
         private set
 
-    fun loadMessages() = viewModelScope.launch {
+    var messages by mutableStateOf<List<ChatMessage>>(emptyList())
+        private set
+
+    fun loadMessages(friendUid: String) = viewModelScope.launch {
         chatLoading = Response.Loading
         try {
             val uid = getCurrentUserUid()
             if (uid != null) {
-                // val newMessages = userRepository.getChatMessages(uid)
-                // messages = newMessages
+                val newMessages = userRepository.getChatMessages(uid, friendUid)
+                messages = newMessages
             }
             chatLoading = Response.Success(true)
         } catch (e: FirebaseFirestoreException) {
@@ -69,12 +85,29 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(toUid: String, message: ChatMessage, navigateBack: () -> Unit) = viewModelScope.launch {
+    fun sendMessage(toUid: String, message: String, fullName: String, navigateBack: () -> Unit) = viewModelScope.launch {
         try {
             val uid = getCurrentUserUid()
             if (uid != null) {
-                userRepository.sendMessage(uid, toUid, message)
-                loadMessages()  // Reload messages after sending a new one
+                val friendProfile = userRepository.getUserProfile(toUid)
+                val timestamp = System.currentTimeMillis()
+                val chatMessage = ChatMessage(
+                    uid_from = uid,
+                    uid_to = toUid,
+                    fullName = fullName,
+                    message = message,
+                    timestamp = timestamp
+                )
+                val date = Date(timestamp)
+                val chatInfo = Chat(
+                    id = toUid,
+                    lastMessage = message,
+                    lastMessageTimestamp = Timestamp(date),
+                    fullName = fullName,
+                    photoUrl = friendProfile?.photoUrl
+                )
+                userRepository.sendMessage(chatMessage, chatInfo)
+                loadMessages(toUid)  // Reload messages after sending a new one
                 navigateBack()
             } else {
                 chatError = "Failed to send message. User is not logged in."
@@ -87,7 +120,7 @@ class ChatViewModel @Inject constructor(
     fun signOut() = authRepository.signOut()
 
 
-    private fun getCurrentUserUid(): String? {
+    fun getCurrentUserUid(): String? {
         return authRepository.currentUser?.uid
     }
 }

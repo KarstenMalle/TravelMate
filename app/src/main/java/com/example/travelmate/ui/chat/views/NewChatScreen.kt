@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.travelmate.domain.model.Response
+import com.example.travelmate.navigation.Screen
 import com.example.travelmate.ui.chat.ChatViewModel
 import com.example.travelmate.ui.friends.components.RemoteImage
 
@@ -55,7 +56,9 @@ fun NewChatScreen(
                         items(friends) { friend ->
                             Text(
                                 text = friend.fullName,
-                                modifier = Modifier.clickable { navigateToChat(friend.uid) }
+                                modifier = Modifier.clickable {
+                                    navigateToChat("${Screen.ChatScreen.route}/${friend.uid}")
+                                }
                             )
                             friend.photoUrl?.let { RemoteImage(it) } // Display friend's profile picture
                         }

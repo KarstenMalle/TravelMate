@@ -8,6 +8,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.travelmate.navigation.Screen.*
+import com.example.travelmate.ui.chat.ChatScreen
 import com.example.travelmate.ui.chat.views.ChatOverviewScreen
 import com.example.travelmate.ui.chat.views.NewChatScreen
 import com.example.travelmate.ui.edit_profile.EditProfileScreen
@@ -15,12 +16,12 @@ import com.example.travelmate.ui.forgot_pw.ForgotPasswordScreen
 import com.example.travelmate.ui.friends.FriendsScreen
 import com.example.travelmate.ui.friends.views.AddFriendsScreen
 import com.example.travelmate.ui.login.LoginScreen
-import com.example.travelmate.ui.map.MapsScreen
 import com.example.travelmate.ui.profile.ProfileScreen
 import com.example.travelmate.ui.sign_up.SignUpScreen
 import com.example.travelmate.ui.verify_email.VerifyEmailScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
+import com.example.travelmate.ui.map.MapsScreen
 
 @Composable
 @ExperimentalAnimationApi
@@ -92,7 +93,7 @@ fun NavGraph(
                     navController.navigate(ChatOverviewScreen.route)
                 },
                 navigateToMapScreen = {
-                    navController.navigate(MapScreen.route)
+                    navController.navigate(MapsScreen.route)
                 }
             )
         }
@@ -112,8 +113,8 @@ fun NavGraph(
                 onAddFriend = {
                     navController.navigate(AddFriendsScreen.route)
                 },
-                onStartChat = {
-                    null
+                onStartChat = { route ->
+                    navController.navigate(route)
                 },
                 navigateToProfileScreen = {
                     navController.navigate(ProfileScreen.route)
@@ -122,7 +123,7 @@ fun NavGraph(
                     navController.navigate(ChatOverviewScreen.route)
                 },
                 navigateToMapScreen = {
-                    // ... navigate to map screen ...
+                    navController.navigate(MapsScreen.route)
                 }
             )
         }
@@ -142,8 +143,8 @@ fun NavGraph(
                 onNewChat = {
                     navController.navigate(NewChatScreen.route)
                 },
-                onOpenChat = {
-                    null
+                onOpenChat = { chatId ->
+                    navController.navigate("${ChatScreen.route}/$chatId")
                 },
                 navigateToProfileScreen = {
                     navController.navigate(ProfileScreen.route)
@@ -152,8 +153,7 @@ fun NavGraph(
                     navController.navigate(FriendsScreen.route)
                 },
                 navigateToMapScreen = {
-                    // ... navigate to map screen ...
-                    navController.navigate(MapScreen.route)
+                    navController.navigate(MapsScreen.route)
                 }
             )
         }
@@ -161,8 +161,8 @@ fun NavGraph(
             route = NewChatScreen.route
         ) {
             NewChatScreen(
-                navigateToChat = {
-                    null
+                navigateToChat = { route ->
+                    navController.navigate(route)
                 },
                 navigateBack = {
                     navController.popBackStack()
@@ -171,9 +171,31 @@ fun NavGraph(
             )
         }
         composable(
-            route = MapScreen.route
-        ){
+            route = "${ChatScreen.route}/{friendId}"
+        ) { backStackEntry ->
+            val friendId = backStackEntry.arguments?.getString("friendId")
+            ChatScreen(
+                friendId = friendId ?: "",
+                navigateBack = {
+                    navController.popBackStack()
+                },
+                viewModel = hiltViewModel()
+            )
+        }
+        composable(
+            route = MapsScreen.route
+        ) {
             MapsScreen(
+                viewModel = hiltViewModel(),
+                navigateToProfileScreen = {
+                    navController.navigate(ProfileScreen.route)
+                },
+                navigateToFriendsScreen = {
+                    navController.navigate(FriendsScreen.route)
+                },
+                navigateToChatScreen = {
+                    navController.navigate(ChatOverviewScreen.route)
+                },
             )
 
         }
