@@ -7,7 +7,7 @@ sealed class Screen(val route: String) {
     object VerifyEmailScreen: Screen("Verify email")
     object ProfileScreen: Screen("Profile")
     object EditProfileScreen: Screen("Edit profile")
-    object MapScreen: Screen("Map")
+    object MapsScreen: Screen("Map")
     object FriendsScreen: Screen("Friends")
 
     object AddFriendsScreen: Screen("Add Friends")

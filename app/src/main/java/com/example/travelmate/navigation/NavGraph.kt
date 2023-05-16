@@ -21,6 +21,7 @@ import com.example.travelmate.ui.sign_up.SignUpScreen
 import com.example.travelmate.ui.verify_email.VerifyEmailScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
+import com.example.travelmate.ui.map.MapsScreen
 
 @Composable
 @ExperimentalAnimationApi
@@ -92,7 +93,7 @@ fun NavGraph(
                     navController.navigate(ChatOverviewScreen.route)
                 },
                 navigateToMapScreen = {
-                    // ... navigate to map screen ...
+                    navController.navigate(MapsScreen.route)
                 }
             )
         }
@@ -122,7 +123,7 @@ fun NavGraph(
                     navController.navigate(ChatOverviewScreen.route)
                 },
                 navigateToMapScreen = {
-                    // ... navigate to map screen ...
+                    navController.navigate(MapsScreen.route)
                 }
             )
         }
@@ -152,7 +153,7 @@ fun NavGraph(
                     navController.navigate(FriendsScreen.route)
                 },
                 navigateToMapScreen = {
-                    // ... navigate to map screen ...
+                    navController.navigate(MapsScreen.route)
                 }
             )
         }
@@ -180,6 +181,23 @@ fun NavGraph(
                 },
                 viewModel = hiltViewModel()
             )
+        }
+        composable(
+            route = MapsScreen.route
+        ) {
+            MapsScreen(
+                viewModel = hiltViewModel(),
+                navigateToProfileScreen = {
+                    navController.navigate(ProfileScreen.route)
+                },
+                navigateToFriendsScreen = {
+                    navController.navigate(FriendsScreen.route)
+                },
+                navigateToChatScreen = {
+                    navController.navigate(ChatOverviewScreen.route)
+                },
+            )
+
         }
     }
 }
