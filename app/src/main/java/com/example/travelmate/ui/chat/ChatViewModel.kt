@@ -60,13 +60,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    private var chatError by mutableStateOf<String?>(null)
 
-
-    var chatError by mutableStateOf<String?>(null)
-        private set
-
-    var chatLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
-        private set
+    private var chatLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
 
     var messages by mutableStateOf<List<ChatMessage>>(emptyList())
         private set

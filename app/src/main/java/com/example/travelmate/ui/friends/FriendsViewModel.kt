@@ -23,8 +23,7 @@ class FriendsViewModel @Inject constructor(
     var friends by mutableStateOf<List<UserProfile>>(emptyList())
         private set
 
-    var friendsError by mutableStateOf<String?>(null)
-        private set
+    private var friendsError by mutableStateOf<String?>(null)
 
     var friendsLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
         private set
@@ -56,7 +55,7 @@ class FriendsViewModel @Inject constructor(
             val uid = getCurrentUserUid()
             if (uid != null) {
                 userRepository.addFriend(uid, friendUid)
-                loadFriends(10)  // Reload friends after adding new friend
+                loadFriends(10)
                 navigateBack()
             } else {
                 friendsError = "Failed to add friend. User is not logged in."
@@ -71,7 +70,12 @@ class FriendsViewModel @Inject constructor(
 
     fun searchFriends(query: String) = viewModelScope.launch {
         try {
-            searchResults = userRepository.searchUsers(query)
+            searchResults = if (query.isEmpty()) {
+                emptyList()
+            } else {
+                val userId = getCurrentUserUid()
+                userRepository.searchUsers(query, userId)
+            }
         } catch (e: FirebaseFirestoreException) {
             // Handle error
         }

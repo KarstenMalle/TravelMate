@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.travelmate.domain.model.Chat
 import com.example.travelmate.domain.repository.AuthRepository
 import com.example.travelmate.domain.repository.ChatRepository
-import com.example.travelmate.domain.repository.UserRepository
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatOverviewViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val chatRepository: ChatRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -36,7 +34,7 @@ class ChatOverviewViewModel @Inject constructor(
         loadChats()
     }
 
-    private fun loadChats() {
+    fun loadChats() {
         viewModelScope.launch {
             _isLoading.value = true
             val uid = authRepository.currentUser?.uid
@@ -44,7 +42,6 @@ class ChatOverviewViewModel @Inject constructor(
                 try {
                     _chats.value = chatRepository.getChats(uid)
                 } catch (e: Exception) {
-                    // If getChats() throws an exception, set the error message
                     _errorMessage.value = "Failed to load chats: ${e.localizedMessage}"
                 }
             }
@@ -66,7 +63,4 @@ class ChatOverviewViewModel @Inject constructor(
             else -> SimpleDateFormat("d. MMM", Locale.getDefault()).format(timestamp.toDate())
         }
     }
-
-
-
 }

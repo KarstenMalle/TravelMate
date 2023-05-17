@@ -1,6 +1,5 @@
 package com.example.travelmate.ui.sign_up
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,9 +12,7 @@ import com.example.travelmate.domain.model.UserProfile
 import com.example.travelmate.domain.repository.AuthRepository
 import com.example.travelmate.domain.repository.SendEmailVerificationResponse
 import com.example.travelmate.domain.repository.SignUpResponse
-import com.example.travelmate.domain.repository.UserRepository
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -26,9 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
 ) : ViewModel() {
 
     private var documentCreationError by mutableStateOf<String?>(null)
@@ -38,17 +33,14 @@ class SignUpViewModel @Inject constructor(
     var sendEmailVerificationResponse by mutableStateOf<SendEmailVerificationResponse>(Success(false))
         private set
 
-    // Add new mutable state values to store data from Step1, Step2, and Step3
     var email by mutableStateOf<String?>(null)
     var password by mutableStateOf<String?>(null)
     var fullName by mutableStateOf<String?>(null)
-    var age by mutableStateOf<Int?>(null)
-    var country by mutableStateOf<String?>(null)
-    var interests by mutableStateOf<List<String>?>(null)
-    var bio by mutableStateOf<String?>(null)
-    var imageUri by mutableStateOf<Uri?>(null)
+    private var age by mutableStateOf<Int?>(null)
+    private var country by mutableStateOf<String?>(null)
+    private var interests by mutableStateOf<List<String>?>(null)
+    private var bio by mutableStateOf<String?>(null)
 
-    // Add new functions to store data from each step
     fun setEmailAndPassword(email: String, password: String) {
         this.email = email
         this.password = password
@@ -73,14 +65,13 @@ class SignUpViewModel @Inject constructor(
             if (signUpResponse is Success) {
                 authRepository.currentUser?.uid?.let { uid ->
                     viewModelScope.launch {
-                        // Use the provided default image URL for new users.
                         val photoUrl = "https://firebasestorage.googleapis.com/v0/b/travelmate-356eb.appspot.com/o/default%2Fdefault-profile-image.png?alt=media&token=7a881272-7de6-4c8f-8088-7124a7931194"
 
                         val userProfile = UserProfile(
                             uid = uid,
                             fullName = fullName!!,
                             email = email!!,
-                            photoUrl = photoUrl, // Set this to the uploaded photo URL
+                            photoUrl = photoUrl,
                             age = age!!,
                             homeCountry = country!!,
                             interests = interests!!,
@@ -98,17 +89,6 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private suspend fun uploadProfilePicture(uid: String, uri: Uri): String? {
-        val imageRef = storage.reference.child("profile_pictures/$uid")
-        return try {
-            imageRef.putFile(uri).await()
-            imageRef.downloadUrl.await().toString()
-        } catch (e: Exception) {
-            Log.e("SignUpViewModel", "Error uploading profile picture: ${e.message}")
-            null
-        }
-    }
-
     private fun createUserDocument(userProfile: UserProfile) {
         val userDocument = userProfile.toHashMap()
 
@@ -118,7 +98,6 @@ class SignUpViewModel @Inject constructor(
                 firestore.collection("users").document(userProfile.uid).set(userDocument).await()
                 Log.d("SignUpViewModel", "User document created successfully")
             } catch (e: Exception) {
-                // Handle any errors that might occur during document creation
                 documentCreationError = e.message
                 Log.e("SignUpViewModel", "Error creating user document: ${e.message}")
             }

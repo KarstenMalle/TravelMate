@@ -54,14 +54,14 @@ class ProfileViewModel @Inject constructor(
     var userProfileError by mutableStateOf<String?>(null)
         private set
 
-    var userProfileLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
+    var userProfileLoading by mutableStateOf<Response<Boolean>>(Loading)
         private set
 
     fun loadUserProfile(uid: String) = viewModelScope.launch {
-        userProfileLoading = Response.Loading
+        userProfileLoading = Loading
         try {
             userProfile = userRepository.getUserProfile(uid)
-            userProfileLoading = Response.Success(true)
+            userProfileLoading = Success(true)
         } catch (e: FirebaseFirestoreException) {
             userProfileError = "Failed to load user profile. Check your internet connection and try again."
             userProfileLoading = Response.Failure(e)
@@ -93,11 +93,10 @@ class ProfileViewModel @Inject constructor(
 
     private val storage = Firebase.storage
 
-    var photoUrlLoading by mutableStateOf<Response<Boolean>>(Response.Loading)
-        private set
+    private var photoUrlLoading by mutableStateOf<Response<Boolean>>(Loading)
 
     fun updatePhotoUrl(photoUri: Uri?) = viewModelScope.launch {
-        photoUrlLoading = Response.Loading
+        photoUrlLoading = Loading
         try {
             photoUri?.let {
                 val url = uploadPhotoAndGetUrl(it)
@@ -106,7 +105,7 @@ class ProfileViewModel @Inject constructor(
                     userProfile = updatedProfile
                     userRepository.updateUserProfile(updatedProfile)
                 }
-                photoUrlLoading = Response.Success(true)
+                photoUrlLoading = Success(true)
             }
         } catch (e: Exception) {
             photoUrlLoading = Response.Failure(e)
@@ -118,10 +117,8 @@ class ProfileViewModel @Inject constructor(
         val photoRef = storage.reference.child("users/$userId/images/${photoUri.lastPathSegment}")
         val uploadTask = photoRef.putFile(photoUri)
 
-        // Await the completion of the upload task
         uploadTask.await()
 
-        // Get the download URL
         photoRef.downloadUrl.await().toString()
     }
 
@@ -143,10 +140,9 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-
-    fun saveUserProfile() = viewModelScope.launch {
+    fun updateInterests(interests: List<String>) {
         userProfile?.let {
-            userRepository.updateUserProfile(it)
+            userProfile = it.copy(interests = interests)
         }
     }
 

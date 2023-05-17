@@ -1,6 +1,5 @@
 package com.example.travelmate.ui.chat.views
 
-import BottomBar
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -21,8 +21,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.travelmate.navigation.Screen
+import com.example.travelmate.ui.components.BottomBar
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -39,6 +40,10 @@ fun ChatOverviewScreen(
     val isLoading by viewModel.isLoading.observeAsState(false)
     val errorMessage by viewModel.errorMessage.observeAsState(null)
 
+    LaunchedEffect(key1 = viewModel) {
+        viewModel.loadChats()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -53,7 +58,7 @@ fun ChatOverviewScreen(
         bottomBar = {
             BottomBar(
                 currentRoute = Screen.ProfileScreen.route,
-                navigateToProfile = navigateToProfileScreen,  // No action needed when already on profile screen
+                navigateToProfile = navigateToProfileScreen,
                 navigateToMap = navigateToMapScreen,
                 navigateToFriends = navigateToFriendsScreen,
                 navigateToChat = {},
@@ -76,7 +81,7 @@ fun ChatOverviewScreen(
                                 .padding(16.dp)
                         ) {
                             Image(
-                                painter = rememberImagePainter(chat.photoUrl),
+                                painter = rememberAsyncImagePainter(chat.photoUrl),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(50.dp)

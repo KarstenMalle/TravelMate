@@ -60,8 +60,11 @@ fun ChatScreen(
                     reverseLayout = true,
                     contentPadding = padding
                 ) {
-                    items(messages.sortedByDescending { it.timestamp }) { message -> // Sort messages by timestamp in descending order
-                        MessageBubble(message = message, isOwnMessage = message.uid_from == viewModel.getCurrentUserUid())
+                    items(messages.sortedByDescending { it.timestamp }) { message ->
+                        MessageBubble(
+                            message = message,
+                            isOwnMessage = message.uid_from == viewModel.getCurrentUserUid()
+                        )
                     }
                 }
 
@@ -85,10 +88,10 @@ fun ChatScreen(
                     Button(
                         onClick = {
                             viewModel.sendMessage(friendId, textState.value.text, friendProfile?.fullName ?: "", navigateBack = {
-                                textState.value = TextFieldValue() // Clear text field after sending message
+                                textState.value = TextFieldValue()
                             })
                         },
-                        enabled = textState.value.text.isNotBlank() // Only enable button if there's text to send
+                        enabled = textState.value.text.isNotBlank()
                     ) {
                         Icon(Icons.Filled.Send, contentDescription = "Send")
                     }
@@ -105,8 +108,7 @@ fun ChatScreen(
 
 @Composable
 fun MessageBubble(message: ChatMessage, isOwnMessage: Boolean) {
-    val alignment = if (isOwnMessage) Alignment.End else Alignment.Start
-    val backgroundColor = if (isOwnMessage) Color(0xFF6200EE) else Color.White
+    val backgroundColor = if (isOwnMessage) Color(0xFF6200EE) else Color.LightGray
 
     Box(
         modifier = Modifier
@@ -118,11 +120,11 @@ fun MessageBubble(message: ChatMessage, isOwnMessage: Boolean) {
             text = message.message,
             color = if (isOwnMessage) Color.White else Color.Black,
             modifier = Modifier
-                .padding(16.dp)
                 .background(
                     color = backgroundColor,
                     shape = RoundedCornerShape(8.dp)
                 )
+                .padding(16.dp)
         )
     }
 }

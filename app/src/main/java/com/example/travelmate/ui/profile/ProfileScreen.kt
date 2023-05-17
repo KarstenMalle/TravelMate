@@ -1,6 +1,5 @@
 package com.example.travelmate.ui.profile
 
-import BottomBar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.travelmate.domain.model.Response
 import com.example.travelmate.navigation.Screen
+import com.example.travelmate.ui.components.BottomBar
 import com.example.travelmate.ui.components.TopBar
 import com.example.travelmate.ui.profile.components.ProfileContent
 import com.example.travelmate.ui.profile.components.RevokeAccess

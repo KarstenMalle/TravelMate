@@ -17,7 +17,6 @@ fun AddFriendsScreen(
     navigateBack: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    // var searchResults = viewModel.searchFriends(searchQuery) // add this function in your ViewModel
 
     Scaffold(
         topBar = {

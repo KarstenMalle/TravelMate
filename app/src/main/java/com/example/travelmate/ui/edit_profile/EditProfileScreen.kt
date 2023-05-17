@@ -1,6 +1,8 @@
 package com.example.travelmate.ui.edit_profile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -32,7 +34,6 @@ fun EditProfileScreen(
         viewModel.loadUserProfile(userId)
     }
 
-    // Show an error message if there's any
     userProfileError?.let {
         showMessage(context, it)
     }
@@ -56,39 +57,56 @@ fun EditProfileScreen(
                     }
                 }
                 is Response.Failure -> {
-                    // Here you could display an error message or some error UI
                     Text("Error loading profile")
                 }
                 is Response.Success -> {
-                    Column(modifier = Modifier.padding(padding)) {
-                        userProfile?.let {
-                            EditProfileForm(
-                                fullName = it.fullName,
-                                onFullNameChange = { viewModel.updateFullName(it) },
-                                age = it.age.toString(),
-                                onAgeChange = { viewModel.updateAge(it) },
-                                homeCountry = it.homeCountry,
-                                onHomeCountryChange = { viewModel.updateHomeCountry(it) },
-                                bio = it.bio,
-                                onBioChange = { viewModel.updateBio(it) },
-                                photoUrl = it.photoUrl,
-                                onPhotoChange = { viewModel.updatePhotoUrl(it) },
-                            )
-                        }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                    ) {
+                        Column(
+                            modifier = Modifier.verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            userProfile?.let { it ->
+                                EditProfileForm(
+                                    fullName = it.fullName,
+                                    onFullNameChange = { viewModel.updateFullName(it) },
+                                    age = it.age.toString(),
+                                    onAgeChange = { viewModel.updateAge(it) },
+                                    homeCountry = it.homeCountry,
+                                    onHomeCountryChange = { viewModel.updateHomeCountry(it) },
+                                    bio = it.bio,
+                                    onBioChange = { viewModel.updateBio(it) },
+                                    interests = it.interests.joinToString(", "),
+                                    onInterestsChange = {
+                                        viewModel.updateInterests(
+                                            it.split(", ").toList()
+                                        )
+                                    },
+                                    photoUrl = it.photoUrl,
+                                    onPhotoChange = { viewModel.updatePhotoUrl(it) },
+                                )
+                            }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+                                Button(onClick = {
+                                    userProfile?.let { viewModel.updateUserProfile(it) }
+                                    navigateBack()
+                                }) {
+                                    Text("Save")
+                                }
 
-                        Button(onClick = {
-                            userProfile?.let { viewModel.updateUserProfile(it) }
-                            navigateBack()
-                        }) {
-                            Text("Save")
-                        }
+                                Button(onClick = navigateBack) {
+                                    Text("Cancel")
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(onClick = navigateBack) {
-                            Text("Cancel")
                         }
                     }
                 }

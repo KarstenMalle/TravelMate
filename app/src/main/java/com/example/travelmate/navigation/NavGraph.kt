@@ -16,12 +16,12 @@ import com.example.travelmate.ui.forgot_pw.ForgotPasswordScreen
 import com.example.travelmate.ui.friends.FriendsScreen
 import com.example.travelmate.ui.friends.views.AddFriendsScreen
 import com.example.travelmate.ui.login.LoginScreen
+import com.example.travelmate.ui.map.MapsScreen
 import com.example.travelmate.ui.profile.ProfileScreen
 import com.example.travelmate.ui.sign_up.SignUpScreen
 import com.example.travelmate.ui.verify_email.VerifyEmailScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import com.example.travelmate.ui.map.MapsScreen
 
 @Composable
 @ExperimentalAnimationApi
@@ -197,7 +197,6 @@ fun NavGraph(
                     navController.navigate(ChatOverviewScreen.route)
                 },
             )
-
         }
     }
 }

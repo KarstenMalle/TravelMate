@@ -56,19 +56,34 @@ class UserRepositoryImpl @Inject constructor(
                 "uid" to friendUid,
                 "fullName" to friendProfile.fullName
             )
-            firestore.collection("users").document(uid).collection("friends").document(friendUid).set(friendData).await()
+            firestore.collection("users").document(uid).collection("friends").document(friendUid)
+                .set(friendData).await()
         }
     }
 
+    override suspend fun getFriendUids(uid: String): List<String> {
+        val friendDocs = firestore.collection("users").document(uid).collection("friends")
+            .get()
+            .await()
 
-    override suspend fun searchUsers(query: String): List<UserProfile> {
-        return firestore.collection("users")
+        return friendDocs.documents.mapNotNull { doc -> doc.getString("uid") }
+    }
+
+
+    override suspend fun searchUsers(query: String, uid: String?): List<UserProfile> {
+
+        val allUsers = firestore.collection("users")
             .orderBy("fullName")
             .startAt(query)
             .endAt(query + '\uf8ff')
             .get()
             .await()
             .toObjects(UserProfile::class.java)
+            .filterNot { it.uid == uid }
+
+        val friendUids = uid?.let { getFriendUids(it) } ?: emptyList()
+
+        return allUsers.filterNot { it.uid in friendUids }
     }
 
 

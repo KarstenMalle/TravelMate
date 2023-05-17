@@ -48,11 +48,10 @@ fun NewChatScreen(
                     }
                 }
                 is Response.Failure -> {
-                    // Here you could display an error message or some error UI
                     Text("Error loading friends")
                 }
                 is Response.Success -> {
-                    LazyColumn(contentPadding = padding) { // Apply padding here
+                    LazyColumn(contentPadding = padding) {
                         items(friends) { friend ->
                             Text(
                                 text = friend.fullName,
@@ -60,7 +59,7 @@ fun NewChatScreen(
                                     navigateToChat("${Screen.ChatScreen.route}/${friend.uid}")
                                 }
                             )
-                            friend.photoUrl?.let { RemoteImage(it) } // Display friend's profile picture
+                            friend.photoUrl?.let { RemoteImage(it) }
                         }
                     }
                 }

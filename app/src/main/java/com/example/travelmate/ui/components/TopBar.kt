@@ -69,7 +69,7 @@ fun TopBar(
                         }
                     ) {
                         Text(
-                            text = "Revoke Access"
+                            text = "Delete account"
                         )
                     }
                 }

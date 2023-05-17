@@ -6,13 +6,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.example.travelmate.domain.model.UserProfile
 import com.example.travelmate.navigation.Screen
@@ -31,29 +35,58 @@ fun FriendsContent(
     onStartChat: (String) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(padding)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
             items(friends) { friend ->
-                Row {
-                    friend.photoUrl?.let { RemoteImage(it) } // Display friend's profile picture
-                    Spacer(Modifier.size(20.dp))
-                    Text(
-                        text = friend.fullName,
-                        style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.colors.onSurface,
-                        modifier = Modifier.clickable { onStartChat("${Screen.ChatScreen.route}/${friend.uid}") }
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onStartChat("${Screen.ChatScreen.route}/${friend.uid}") }
+                        .padding(16.dp)
+                ) {
+                    friend.photoUrl?.let {
+                        RemoteImage(it)
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            text = friend.fullName,
+                            style = MaterialTheme.typography.h6,
+                            color = MaterialTheme.colors.onSurface,
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = constructInterestsString(friend.interests, 30),
+                            style = MaterialTheme.typography.body2,
+                            color = MaterialTheme.colors.onSurface,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
         }
 
         Spacer(Modifier.weight(1f))
 
-        Button(onClick = onAddFriend) {
-            Text("Add Friend")
+        Row(
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Button(onClick = onAddFriend) {
+                Text("Add Friend")
+            }
         }
     }
 }
@@ -87,8 +120,43 @@ fun RemoteImage(url: String) {
         Image(
             bitmap = img,
             contentDescription = null,
-            modifier = Modifier.size(40.dp) // Adjust size as needed
+            modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
         )
     }
 }
+
+
+fun constructInterestsString(interests: List<String>, maxLength: Int): String {
+    val result = StringBuilder()
+    var length = 0
+    for (interest in interests) {
+        val words = interest.split(" ")
+        for (word in words) {
+            if (length + word.length + 2 > maxLength) {
+                return "${result}..."
+            }
+            if (result.isNotEmpty()) {
+                result.append(" ")
+                length++
+            }
+            result.append(word)
+            length += word.length
+        }
+        result.append(",")
+        length++
+    }
+    if (length > 0 && result[length - 1] == ',') {
+        result.deleteCharAt(length - 1)
+    }
+    return result.toString()
+}
+
+
+
+
+
+
 

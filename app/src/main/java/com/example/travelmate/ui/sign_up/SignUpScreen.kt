@@ -34,12 +34,10 @@ fun SignUpScreen(
                     navigateBack = navigateBack
                 )
                 2 -> RegistrationStep1 { fullName, age, country ->
-                    // Pass the values to the viewModel
                     viewModel.setStep1Data(fullName, age, country)
                     step = 3
                 }
                 3 -> RegistrationStep2 { interests, bio ->
-                    // Pass the values to the viewModel
                     viewModel.setStep2Data(interests, bio)
                     viewModel.signUpWithEmailAndPassword()
                 }

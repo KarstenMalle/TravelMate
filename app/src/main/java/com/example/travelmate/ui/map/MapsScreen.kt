@@ -1,6 +1,5 @@
 package com.example.travelmate.ui.map
 
-import BottomBar
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
@@ -8,15 +7,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.travelmate.R
 import com.example.travelmate.navigation.Screen
+import com.example.travelmate.ui.components.BottomBar
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.MarkerOptions
